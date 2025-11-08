@@ -1,0 +1,15 @@
+
+- name: Bring down Docker Compose stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ project_dir }}"
+    state: absent
+    remove_images: all  # optional: removes images used by the compose file
+  environment:
+    ANSIBLE_USERNAME: "{{ ansible_user }}"
+  ignore_errors: yes  # In case the compose stack is not up
+
+- name: Remove Docker network
+  community.docker.docker_network:
+    name: inception
+    state: absent
+  ignore_errors: yes  # Avoid failure if network doesn't exist

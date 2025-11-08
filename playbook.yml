@@ -1,0 +1,19 @@
+- name: Install Docker on Ubuntu
+  hosts: all
+  become: true
+
+  vars:
+    project_dir: /website
+
+  roles:
+    - role: docker
+    - role: mariadb
+    - role: wordpress
+    - role: nginx
+    - role: config
+    - role: deploy
+    - role: docker-restart
+    - role: docker-down
+      tags: [clean, fclean, never]
+    - role: clean-all
+      tags: [fclean, never]

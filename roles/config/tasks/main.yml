@@ -1,0 +1,16 @@
+- name: Copy docker-compose.yml and env to server
+  ansible.builtin.copy:
+    src: .
+    dest: "{{ project_dir }}/"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+
+- name: Create required volumes directories
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/data/{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - db
+    - wordpress

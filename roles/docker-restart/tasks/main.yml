@@ -1,0 +1,39 @@
+- name: Restart all containers
+  ansible.builtin.command:
+    cmd: docker compose restart
+    chdir: "{{ project_dir }}"
+  environment:
+    ANSIBLE_USERNAME: "{{ ansible_user }}"
+  tags:
+    - restart-all
+    - never
+
+- name: Restart mariadb
+  ansible.builtin.command:
+    cmd: docker compose restart mariadb
+    chdir: "{{ project_dir }}"
+  environment:
+    ANSIBLE_USERNAME: "{{ ansible_user }}"
+  tags:
+    - restart-mariadb
+    - never
+
+- name: Restart wordpress
+  ansible.builtin.command:
+    cmd: docker compose restart wordpress
+    chdir: "{{ project_dir }}"
+  environment:
+    ANSIBLE_USERNAME: "{{ ansible_user }}"
+  tags:
+    - restart-wordpress
+    - never
+
+- name: Restart nginx
+  ansible.builtin.command:
+    cmd: docker compose restart nginx
+    chdir: "{{ project_dir }}"
+  environment:
+    ANSIBLE_USERNAME: "{{ ansible_user }}"
+  tags:
+    - restart-nginx
+    - never

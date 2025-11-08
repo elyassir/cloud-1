@@ -1,0 +1,7 @@
+- name: Copy mariadb requirements files
+  ansible.builtin.copy:
+    src: .
+    dest: "{{ project_dir }}/requirements/mariadb"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'

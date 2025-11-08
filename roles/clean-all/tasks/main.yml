@@ -1,0 +1,16 @@
+- name: Remove Docker volumes
+  community.docker.docker_volume:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - databases
+    - wordpress
+  ignore_errors: yes
+
+- name: Remove data directory
+  file:
+    path: "/home/{{ ansible_user }}/data/{{ item }}"
+    state: absent
+  loop:
+    - db
+    - wordpress

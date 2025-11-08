@@ -1,0 +1,108 @@
+# version: '3.8'
+name: inception
+
+services:
+  nginx:
+    image: nginx
+    container_name: nginx
+    pull_policy: never
+    build:
+      context: ./requirements/nginx/
+      args:
+        CRS_COUNTRYCODE: ${CRS_COUNTRYCODE}
+        CRS_STATE: ${CRS_STATE}
+        CRS_LOCATION: ${CRS_LOCATION}
+        CRS_ORGANIZATION: ${CRS_ORGANIZATION}
+        CRS_SECTION: ${CRS_SECTION}
+        CRS_COMMONNAME: ${CRS_COMMONNAME}
+        CRS_EMAIL: ${CRS_EMAIL}
+        CRS_PATH: ${CRS_PATH}
+    ports:
+      - "443:443"
+      - "80:80"
+    env_file:
+      - .env
+    volumes:
+      - wp-volume:/var/www/elyassir
+    restart: unless-stopped
+    depends_on:
+      - wordpress
+    networks:
+      - inception
+
+  wordpress:
+    image: wordpress
+    container_name: wordpress
+    pull_policy: never
+    build:
+      context: ./requirements/wordpress/
+      args:
+        DB_NAME: ${DB_NAME}
+        DB_USER: ${DB_USER}
+        DB_PASSWORD: ${DB_PASSWORD}
+        DB_HOST: mariadb
+        WP_URL: ${WP_URL}
+    env_file:
+      - .env
+    volumes:
+      - wp-volume:/var/www/elyassir
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+    networks:
+      - inception
+
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    pull_policy: never
+    build:
+      context: ./requirements/mariadb/
+      args:
+        DB_NAME: ${DB_NAME}
+        DB_USER: ${DB_USER}
+        DB_PASSWORD: ${DB_PASSWORD}
+        DB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    env_file:
+      - .env
+    volumes:
+      - db-volume:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - inception
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "127.0.0.1:8080:80" # local access
+      # - "8080:80" # public access
+    environment:
+      PMA_HOST: mariadb
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    env_file:
+      - .env
+    depends_on:
+      - mariadb
+    restart: unless-stopped
+    networks:
+      - inception
+
+networks:
+  inception:
+    name: inception
+
+volumes:
+
+  db-volume:
+    name: databases
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/${ANSIBLE_USERNAME}/data/db/
+
+  wp-volume:
+    name: wordpress
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/${ANSIBLE_USERNAME}/data/wordpress/
